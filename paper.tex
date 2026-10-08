@@ -1,0 +1,1764 @@
+% SPDX-License-Identifier: Apache-2.0
+% Sections 2--4 adapt the Apache-2.0 source of OpenAI's 2026 pi manuscript.
+% Attribution and the original Apache-2.0 license are preserved in NOTICE and LICENSE.
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,fancyhdr}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools,booktabs,longtable}
+\usepackage[colorlinks=true,linkcolor=blue,urlcolor=blue,citecolor=blue]{hyperref}
+\setlength{\emergencystretch}{3em}
+\newcommand{\CC}{\mathbb C}
+\newcommand{\RR}{\mathbb R}
+\newcommand{\QQ}{\mathbb Q}
+\newcommand{\ZZ}{\mathbb Z}
+\newcommand{\NN}{\mathbb Z_{\ge0}}
+\newcommand{\ii}{\mathrm i}
+\DeclareMathOperator{\ord}{ord}
+\DeclareMathOperator{\lcm}{lcm}
+\DeclareMathOperator{\codim}{codim}
+\DeclareMathOperator{\Spec}{Spec}
+\DeclareMathOperator{\Proj}{Proj}
+\DeclareMathOperator{\Supp}{Supp}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\numberwithin{equation}{section}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small Candidate logarithm argument}
+\fancyhead[R]{\small Not independently certified}
+\fancyfoot[C]{\thepage}
+\setlength{\headheight}{14pt}
+\hypersetup{pdftitle={Irrationality exponents of log 2 and rational logarithms: candidate proof},
+pdfauthor={Research draft prepared with Codex},
+pdfsubject={Proposed distinct-center interpolation argument; unverified mathematical status}}
+\title{Candidate proofs for the irrationality exponents\\of $\log 2$ and rational logarithms}
+\author{Research draft prepared with Codex}
+\date{8 October 2026}
+\begin{document}
+\maketitle
+\begin{abstract}
+This document gives the full proposed interpolation and determinant
+argument for the irrationality exponent of the natural logarithm of two.
+It adapts the separated-weight method in OpenAI's manuscript on $\pi$,
+replacing centers with $Y=1$ by distinct multiplicative centers $Y=2^j$.
+A separate section extends the argument to $\log a$ for positive rational $a\ne1$,
+nonzero rational linear combinations of such logarithms, and positive
+algebraic numbers with a positive integral power in $\QQ$.
+The crucial generalized interpolation statement and the resulting proof
+are candidates requiring further verification. This document does not
+establish a certified new theorem.
+\end{abstract}
+\begin{center}
+\fbox{\begin{minipage}{0.91\textwidth}
+\textbf{Verification status.}
+The new distinct-$Y$ geometric interpolation argument has been read
+internally, but has not been independently certified or formalized.
+Parameter calculations and successful TeX compilation do not validate
+that argument. Every proof below is presented as part of the candidate
+derivation, with its exact claim available for scrutiny.
+\end{minipage}}
+\end{center}
+\tableofcontents
+\clearpage
+
+\section{Claim, provenance, and verification boundary}
+For an irrational real number $x$, use
+\[
+\mu(x)=\sup\{\nu>0:0<|x-p/q|<q^{-\nu}
+\text{ for infinitely many coprime }p\in\ZZ,\ q\ge2\}.
+\]
+Dirichlet's theorem gives $\mu(x)\ge2$. The published bound used here
+as background is Marcovecchio's $\mu(\log2)<3.57455391$
+\cite[Theorem 1.1]{marcovecchio}.
+
+Sections 2--4 adapt OpenAI's \emph{The irrationality exponent of $\pi$
+is $2$}, dated 24 September 2026 \cite{openai}. Credit for the local
+multiplicity, projective interpolation, determinant and parameter
+mechanisms belongs to that manuscript and the earlier work cited below.
+The original source is publicly linked in the references;
+the Apache-2.0 license and adaptation notice accompany this manuscript. This standalone source has no external TeX inputs,
+figures, or bibliography files.
+
+The substantive proposed modification is to use centers
+$(2^j,jp_1/q_1,\ldots,jp_m/q_m)$ and local coordinates
+\[
+Y=2^j(1+t),\qquad
+X_i=jp_i/q_i+u_i+\log(1+t).
+\]
+The new geometric statement must allow successive weight thresholds to
+be selected independently of the center coordinates. Only the eventual
+degree threshold may depend on the fixed centers. This order of
+quantifiers is essential to the final contradiction.
+
+The posted Lean implementation for the source $\pi$ theorem has not been
+rebuilt or exhaustively audited here. It does not certify this proposed
+$\log2$ extension. No exhaustive novelty claim is made. An external
+mathematical audit or an appropriate formal proof remains necessary to
+establish the candidate result.
+
+\begin{theorem}[Proposed result; candidate proof]
+\label{thm:main}
+For every real $\nu>2$, there is an integer $Q(\nu)$ such that
+\[
+|\log2-p/q|\ge q^{-\nu}
+\qquad(p\in\ZZ,\ q\in\ZZ,\ q\ge Q(\nu)).
+\]
+Consequently $\mu(\log2)=2$.
+\end{theorem}
+The remaining sections give the proposed argument, rather than a claim
+that its correctness has already been established.
+
+\section{Interpolation with separated weights}
+\label{geom:section}
+
+We prove the interpolation statement used in the determinant argument. Its
+essential uniformity is that the weights can be chosen before the interpolation
+points: each coordinate weight has a lower threshold depending on the earlier
+weights, but not on the locations of the points. The degree at which
+interpolation becomes surjective is allowed to depend on all the fixed data.
+
+All multi-indices below have nonnegative integer entries. For a positive
+rational vector $W=(w_0,\ldots,w_m)$, the $W$-degree of the
+monomial $Y^hX_1^{\alpha_1}\cdots X_m^{\alpha_m}$ is
+$w_0h+\sum_iw_i\alpha_i$. Write $\mathcal P_W(H)$ for the complex vector
+space of polynomials of $W$-degree at most $H$. For a positive rational vector
+$V=(v_0,\ldots,v_m)$, let $\mathcal J_V(H)$ be the quotient of
+$\CC[[t,u_1,\ldots,u_m]]$ by the ideal of series whose monomials all have
+$V$-weight at least $H$. Thus a vector in $\mathcal J_V(H)$ is a packet of
+coefficients indexed by
+\[
+ v_0s+\sum_{i=1}^m v_i\beta_i<H.
+\]
+The strict inequality in this definition will be used throughout.
+
+\begin{theorem}[Separated-weight interpolation]
+\label{geom:interpolation}
+Fix integers $m,K\ge1$ and positive rational numbers $w_0,v_0,\theta$ such
+that $0<\theta<1$ and
+\begin{equation}
+\label{geom:volume-hypotheses}
+ K\theta^m<1,
+ \qquad K\frac{w_0}{v_0}\theta^m<1.
+\end{equation}
+There are successive lower thresholds for positive rational numbers
+$w_1,\ldots,w_m$, depending only on these fixed data and the previously
+chosen weights, with the following property. Put
+\[
+ W=(w_0,w_1,\ldots,w_m),\qquad
+ V=(v_0,w_1/\theta,\ldots,w_m/\theta).
+\]
+For any points
+\[
+ a_j=(y_j,c_{j1},\ldots,c_{jm})\in\CC^{m+1},\qquad 0\le j<K,
+\]
+where $y_0,\ldots,y_{K-1}$ are nonzero and pairwise distinct, the map
+\begin{equation}
+\label{geom:jet-map}
+ \begin{aligned}
+ \mathcal P_W(H)&\longrightarrow\bigoplus_{j=0}^{K-1}\mathcal J_V(H),\\
+ P&\longmapsto
+ \left(P\bigl(y_j(1+t),(c_{ji}+u_i+\log(1+t))_{i=1}^m\bigr)\right)_{j=0}^{K-1}.
+ \end{aligned}
+\end{equation}
+is surjective for all sufficiently large, sufficiently divisible integers $H$.
+The divisibility requirement can be chosen using only the weights. The
+remaining lower threshold for $H$ may depend on the points.
+\end{theorem}
+
+We first establish a numerical inequality on algebraic curves, and then use
+it to obtain all the jets in \eqref{geom:jet-map}. The local estimate driving
+the curve argument is recorded separately.
+
+\subsection{A local multiplicity comparison}
+
+A collection of vector fields is called a \emph{normal basis} to a smooth
+subvariety at a point if its images form a basis of the ambient tangent space
+modulo the tangent space of the subvariety. For an irreducible subvariety,
+this terminology will refer to a general smooth point. There are only
+finitely many possible index sets in the applications below, so all their
+generic rank conditions can be checked on one common open subset.
+
+\begin{lemma}[Weighted transverse multiplicity]
+\label{geom:multiplicity}
+Give the coordinates $x_1,\ldots,x_d$ positive rational degree weights
+$\rho_1,\ldots,\rho_d$. On an open subset of $\CC^d$, let
+$D_1,\ldots,D_d$ be commuting analytic vector fields forming a frame, and
+assign them positive rational costs $\kappa_1,\ldots,\kappa_d$. Fix
+$\varepsilon>0$.
+
+Let $N>0$. Suppose that polynomials $f_1,\ldots,f_r$ have weighted degree at most $N$,
+that $Z$ is an irreducible component of their common zero set of codimension
+$k\ge1$, and that
+\begin{equation}
+\label{geom:persistent-derivatives}
+ D^\gamma f_\ell\big|_Z=0
+ \quad\text{whenever}\quad
+ \sum_b\kappa_b\gamma_b<\varepsilon N.
+\end{equation}
+For any coordinate normal basis $A$ and any $D$-field normal basis $B$,
+each of cardinality $k$, one has
+\begin{equation}
+\label{geom:multiplicity-comparison}
+ \prod_{a\in A}\rho_a
+ \le 2k!\,\varepsilon^{-k}\prod_{b\in B}\kappa_b
+\end{equation}
+The bound is uniform in the equations, the component $Z$, and the
+analytic frame; no lower threshold for $N$ is required.
+\end{lemma}
+
+\begin{proof}
+Choose a smooth point $x$ of $Z$ where both normal-basis conditions hold and
+which lies on no other irreducible component of the common zero set. Flowing
+from $Z$ along the fields indexed by $B$ gives local analytic coordinates
+$(z,b)$, where $z$ parametrizes $Z$ and $b=(b_1,\ldots,b_k)$ consists of
+transverse flow parameters. Commutativity implies that the chosen fields
+are the derivatives in the $b$-directions. Thus
+\eqref{geom:persistent-derivatives} says that in the expansion
+\[
+ f_\ell(z,b)=\sum_{\alpha\in\NN^k} f_{\ell,\alpha}(z)b^\alpha,
+\]
+every coefficient function of $B$-weight less than $\varepsilon N$ vanishes
+identically on the chosen neighborhood in $Z$.
+
+Let $S$ be the affine coordinate slice through $x$ obtained by fixing the
+coordinates outside $A$. It is transverse to $Z$, and the zero set of the
+restricted equations is isolated at $x$. The flow parameters $b$ give
+regular analytic coordinates on $S$; the coordinates $z$ become analytic
+functions $z(b)$. Substitution cannot generate a missing term of smaller
+$B$-weight. Indeed, each surviving summand already contains a monomial
+$b^\alpha$ of weight at least $\varepsilon N$, and its analytic coefficient
+has only nonnegative powers of $b$. Consequently the ideal of the
+restricted equations is contained in the monomial ideal of weight at least
+$\varepsilon N$. Its quotient therefore has length at least
+\begin{equation}
+\label{geom:local-length-lower}
+ \#\left\{\alpha\in\NN^k:
+       \sum_{b\in B}\kappa_b\alpha_b<\varepsilon N\right\}
+ \ge \frac{(\varepsilon N)^k}{2k!\prod_{b\in B}\kappa_b}
+\end{equation}
+In fact the factor $1/2$ can be omitted: the simplex
+$\{x\in\RR_{\ge0}^k:\sum_{b\in B}\kappa_bx_b<\varepsilon N\}$
+is covered by the disjoint half-open unit cubes $\alpha+[0,1)^k$
+indexed by the admissible multi-indices $\alpha=\lfloor x\rfloor$. Its volume is
+$(\varepsilon N)^k/(k!\prod_{b\in B}\kappa_b)$. Thus the displayed
+bound holds for every $N>0$. Analytic local coordinates preserve finite
+length, so no radius or coefficient bound for the flow map is needed.
+
+In the regular local ring of the $k$-dimensional slice, the ideal generated
+by the restricted equations is primary to the maximal ideal. Over the
+infinite field $\CC$, $k$ sufficiently general constant linear
+combinations of these equations still have an isolated common zero at
+$x$: successive generic combinations avoid the finitely many
+positive-dimensional components that remain. Their ideal is contained
+in the original ideal. Their quotient length is therefore an upper bound
+for the length in \eqref{geom:local-length-lower}.
+
+Each of the $k$ combinations has weighted degree at most $N$ in the
+variables indexed by $A$. We claim that their local intersection length
+is at most
+\begin{equation}
+\label{geom:weighted-bezout}
+ \frac{N^k}{\prod_{a\in A}\rho_a}.
+\end{equation}
+Choose an integer $M_0$ clearing the denominators of the $\rho_a$, and
+make the substitutions
+\[
+ x_a=\lambda_a+z_a^{M_0\rho_a}\qquad(a\in A).
+\]
+Choose the constants $\lambda_a$ so that no preimage of the given point
+is ramified. There are $\prod_{a\in A}(M_0\rho_a)$ such preimages, each
+with the same local intersection length. The substituted polynomials
+have ordinary total degree at most $M_0N$. The ordinary B\'ezout bound
+for isolated complete-intersection zeros, with their local
+multiplicities, bounds the sum of these lengths by $(M_0N)^k$;
+see \cite[Corollary~VIII.3, p.~144]{mondal2021}.
+The multiplicities there are local quotient lengths, unchanged by
+completion \cite[Section~IV.4.2]{mondal2021}.
+Dividing gives \eqref{geom:weighted-bezout}.
+This application concerns isolated zeros only and permits other
+components elsewhere.
+
+Combining \eqref{geom:local-length-lower} and
+\eqref{geom:weighted-bezout} proves the result. Neither the
+polynomials nor the possibly varying component enters the constant in
+\eqref{geom:multiplicity-comparison}.
+\end{proof}
+
+\subsection{The curve inequality}
+
+Choose a positive rational number $\sigma$ sufficiently small that
+\begin{equation}
+\label{geom:sigma}
+ \begin{split}
+ (1+3\sigma)^{m+1}K(w_0/v_0)\theta^m&<1,\\
+ (1+3\sigma)^mK\theta^m&<1,\\
+ (1+\sigma)\theta&<1.
+ \end{split}
+\end{equation}
+This choice is possible by \eqref{geom:volume-hypotheses}. Set $v_i=w_i/\theta$
+for $i>0$. Fix $L_0=m+2$ and put
+\begin{equation}
+\label{geom:constant}
+ C_* =\max_{1\le k\le m}2k!(L_0/\sigma)^k.
+\end{equation}
+We choose the positive weights successively so that for every pair of
+subsets $A,B\subseteq\{0,\ldots,m\}$ of the same cardinality between
+$1$ and $m$,
+\begin{equation}
+\label{geom:separation}
+ \prod_{a\in A}w_a>C_*\prod_{b\in B}v_b
+\end{equation}
+whenever the largest positive index in their symmetric difference belongs
+to $A$.
+
+Here and below a condition involving that largest index is imposed only
+when a positive index does differ. The successive choice is possible:
+if this largest index is $i$, the ratio in \eqref{geom:separation} is
+$w_i$ times a positive expression in the already chosen lower weights
+and the fixed zeroth weights. Every higher index occurs in both sets or
+in neither; in the former case its ratio is $w_j/v_j=\theta$. Hence the
+expression is independent of all higher weights. There are finitely many
+pairs of sets. A sufficiently large choice of $w_i$ enforces all
+conditions whose largest differing index is $i$, and subsequent choices
+do not disturb them. This construction involves no interpolation point.
+
+Let $C$ be an irreducible algebraic curve whose generic point lies in the
+affine coordinate chart. Such a curve has a smooth projective model over
+$\CC$; see \cite[Theorem~53.2.6 and Lemma~53.2.8, Tag~0BXX]{stacks}.
+On that model define
+\begin{equation}
+\label{geom:curve-degree}
+ \deg_W C=
+ \sum_P\max\left\{0,-\frac{\operatorname{ord}_P Y}{w_0},
+                  -\frac{\operatorname{ord}_P X_1}{w_1},\ldots,
+                  -\frac{\operatorname{ord}_P X_m}{w_m}\right\}.
+\end{equation}
+The order of an identically zero coordinate is understood as $+\infty$;
+it contributes no pole. At a branch $P$ through $a_j$, set
+\begin{equation}
+\label{geom:branch-contact}
+ h_P=\min\left\{
+ \frac{\operatorname{ord}_P(Y-y_j)}{v_0},
+ \frac{\operatorname{ord}_P(X_1-c_{j1}-\log(Y/y_j))}{v_1},\ldots,
+ \frac{\operatorname{ord}_P(X_m-c_{jm}-\log(Y/y_j))}{v_m}
+ \right\}.
+\end{equation}
+The logarithm here is its formal expansion at $Y=y_j$, namely $\log(Y/y_j)$. All entries have
+positive order, possibly infinite, and their minimum is finite on a
+nonconstant curve.
+
+\begin{proposition}[Curve inequality]
+\label{geom:curve-inequality}
+With the weights chosen above, every such curve satisfies
+\begin{equation}
+\label{geom:curve-bound}
+ \deg_W C\ge(1+\sigma)\sum_{P\mapsto a_j}h_P,
+\end{equation}
+where the sum includes all branches through the prescribed points.
+\end{proposition}
+
+\begin{proof}
+There is nothing to prove if the curve misses all the points. Suppose
+instead that \eqref{geom:curve-bound} fails. For every sufficiently large
+auxiliary integer $N$, linear algebra gives a nonzero polynomial $F_N$
+of $W$-degree at most $N$ whose expansions at all the points have
+$V$-order at least $(1+3\sigma)N$. Indeed, the number of its coefficients
+has leading term
+\[
+ \frac{N^{m+1}}{(m+1)!\prod_{a=0}^m w_a},
+\]
+whereas the number of conditions has leading term
+\[
+ \frac{K(1+3\sigma)^{m+1}N^{m+1}}
+      {(m+1)!\prod_{a=0}^m v_a}.
+\]
+Their comparison is the first inequality in \eqref{geom:sigma}. This
+argument requires no independence among the conditions.
+
+On the open set $Y\ne0$ consider the commuting frame
+\begin{equation}
+\label{geom:frame}
+ D_0=Y\partial_Y+\sum_{i=1}^m\partial_{X_i},\qquad
+ D_i=\partial_{X_i}\quad(1\le i\le m).
+\end{equation}
+It preserves polynomial degree at most $N$. In the formal coordinates of
+\eqref{geom:jet-map},
+\[
+ D_0=(1+t)\partial_t,\qquad D_i=\partial_{u_i}.
+\]
+Thus differentiation by $D_a$ decreases weighted order by at most $v_a$.
+Every $D^\gamma F_N$ with $\sum_av_a\gamma_a\le\sigma N$ retains
+order at least $(1+2\sigma)N$ at each point. On a branch $P$, its order
+is consequently at least $(1+2\sigma)N h_P$.
+
+A polynomial of $W$-degree at most $N$ restricts to a rational function
+on the complete model of $C$ with total pole degree at most
+$N\deg_W C$. Since we assumed that \eqref{geom:curve-bound} fails, the
+just obtained total zero order exceeds this pole bound. The ordinary
+divisor equality for a nonzero rational function therefore forces
+\begin{equation}
+\label{geom:derivatives-on-curve}
+ D^\gamma F_N\big|_C=0
+ \qquad\left(\sum_av_a\gamma_a\le\sigma N\right).
+\end{equation}
+All the assertions about branch orders hold for formal power series:
+each monomial has order at least its weight times $h_P$, and
+cancellation can only increase the order.
+
+We have converted excess contact into vanishing of many derivatives on
+$C$. We next find a component on which that vanishing persists, as in
+the derivative-ideal method of zero estimates
+\cite[Section~5]{philippon1986}, and compare all its normal bases.
+Put $\delta=\sigma N/L_0$. For $0\le r\le L_0$, let $V_r$ be the common
+zero set in $Y\ne0$ of the derivatives of cost at most $r\delta$.
+Let $C^\circ$ be the part of $C$ in this affine open set. The $V_r$
+form a decreasing chain, and \eqref{geom:derivatives-on-curve} puts
+$C^\circ$ in $V_{L_0}$. Choose an irreducible component of $V_{L_0}$ containing
+$C^\circ$, and extend it backwards to nested irreducible components of the
+earlier $V_r$. Every selected component has dimension between $1$ and
+$m$: it contains a curve, and it lies in the proper zero set of
+$F_N$. Since there are $L_0+1=m+3$ levels, two adjacent selected
+components coincide. Denote this persistent component by $Z$, and
+write $k=\operatorname{codim}Z$.
+
+Take the derivatives of cost at most $r\delta$ as the equations of the
+earlier of these two levels. Any further derivative of cost less than
+$\delta$ vanishes along $Z$, because the fields commute and $Z$ is
+also a component at the next level. Lemma~\ref{geom:multiplicity}, with
+$\varepsilon=\sigma/L_0$, gives
+\begin{equation}
+\label{geom:all-bases}
+ \prod_{a\in A}w_a\le C_*\prod_{b\in B}v_b
+\end{equation}
+for every coordinate normal basis $A$ and every frame normal basis $B$.
+The equations and $Z$ may vary with $N$; the uniformity proved in
+Lemma~\ref{geom:multiplicity} is exactly what permits this use.
+
+We show that $Y$ is constant on $Z$, working on the common smooth open
+subset where all the normal-basis conditions hold. Suppose first that
+some positive coordinate direction is nontangent to $Z$, and choose the
+largest such index $i$. Every larger positive index occurs in neither
+kind of normal basis, since $D_j=\partial_{X_j}$ for $j>0$.
+Some coordinate normal basis $A$ contains $i$. If a frame normal basis
+$B$ omitted $i$, the largest positive index where these sets differ
+would be $i$. Then
+\eqref{geom:separation} would contradict \eqref{geom:all-bases}.
+Thus every frame normal basis contains $D_i$.
+
+The other frame vectors consequently fail to span the normal quotient.
+Their ambient span is the hyperplane
+\[
+ \ker(dX_i-dY/Y).
+\]
+For an ambient hyperplane $Q$ and a tangent space $T$, the image of
+$Q$ in the quotient by $T$ fails to be surjective precisely when
+$T\subseteq Q$. We obtain
+\begin{equation}
+\label{geom:log-differential}
+ dX_i=dY/Y\quad\text{on }Z.
+\end{equation}
+This identity forces $Y$ to be constant on the algebraic variety $Z$.
+Indeed, if $Y$ were nonconstant, choose a smooth point where $dY\ne0$
+and intersect with general algebraic hyperplanes through that point
+until a curve remains on which $Y$ is nonconstant. On the smooth
+complete model of this curve, \eqref{geom:log-differential} is an
+identity of meromorphic differentials. A nonconstant meromorphic
+function $Y$ has a zero or pole, where $dY/Y$ has nonzero residue
+$\operatorname{ord}_P Y$. An exact differential $dX_i$ has zero
+residue at every point. This is a contradiction. It follows also
+that $X_i$ is constant, since $dX_i=0$ in characteristic zero.
+
+If instead every positive coordinate direction is tangent, the $m$
+independent vectors $\partial_{X_i}$ all lie in the tangent space of
+$Z$. Properness forces that tangent space to be their span, and
+$dY=0$ on $Z$ again. We conclude in all cases that $Y$ is constant
+on $Z$, and hence on $C$. Since the nonzero numbers $y_j$ are pairwise
+distinct, $C$ passes through at most one prescribed center, say $a_j$.
+At least one $X_l$ is nonconstant on $C$, since $C$ is a curve and $Y$
+is constant. On every branch through this center, $Y=y_j$ and therefore
+$\log(Y/y_j)=0$. The nonzero rational function $X_l-c_{jl}$ has total
+pole degree at most $w_l\deg_W C$, whereas its order at each of these
+branches is at least $(w_l/\theta)h_P$. Consequently
+\[
+ \deg_W C\ge\theta^{-1}\sum_{P\mapsto a_j}h_P
+           >(1+\sigma)\sum_{P\mapsto a_j}h_P.
+\]
+This contradicts the assumed failure of the curve inequality.
+The original proof's second argument inside the fiber $Y=1$ is
+unnecessary here. The hypothesis $K\theta^m<1$ has been retained to
+keep the subsequent parameter choice identical to the source proof.
+\end{proof}
+
+\subsection{From the curve inequality to all coefficient packets}
+
+We complete the proof of Theorem~\ref{geom:interpolation}. The argument uses
+ordinary projective schemes and the ordinary blow-up; smoothness or
+normality of the compactification will not be needed. Curve positivity
+and asymptotic jet generation are closely related in the Seshadri-constant
+approach of \cite[Section~6]{demailly1992}. Here we supply the passage
+for our weighted ideals at several points, including the eventual
+ordinary-power comparison required on a possibly singular scheme.
+
+Choose an integer $R$ sufficiently large that $R/w_a$ and $R/v_a$ are
+positive integers for every index. Embed affine space by all monomials
+of $W$-degree at most $R$, including the constant monomial, and let
+$X$ be the projective closure of the image. Since these monomials
+include each coordinate, the chart of the constant monomial is
+precisely the original affine space. Let $L=\mathcal O_X(1)$, a very
+ample line bundle.
+
+For any curve meeting this chart,
+\begin{equation}
+\label{geom:projective-degree}
+ \deg(L|_C)=R\deg_W C.
+\end{equation}
+To see this on its smooth complete model, at each point clear the
+largest pole of the homogeneous monomial coordinates. Every monomial
+has pole order at most $R$ times the maximum in
+\eqref{geom:curve-degree}. A pure power of one coordinate attains
+that bound whenever the maximum is positive, and the constant
+monomial attains it when the maximum is zero. The resulting sections
+have no common zero, proving \eqref{geom:projective-degree}.
+
+To make the local data algebraic, replace $\log(1+t)$ in each
+coordinate by a fixed Taylor polynomial $G_i(t)$ whose omitted
+terms have $t$-weight strictly greater than $v_i$. Then
+\[
+ t=Y/y_j-1,\qquad u_i'=X_i-c_{ji}-G_i(t)
+\]
+are regular local coordinates at $a_j$. This replacement preserves
+$h_P$. Indeed, if $t$ is not identically zero on a branch, each
+omitted term has order divided by $v_i$ strictly larger than
+$\operatorname{ord}_P(t)/v_0$; if $t$ is identically zero, its tail
+vanishes. It also preserves interpolation surjectivity for every
+threshold: the formal coordinate change fixes $t$ and changes
+$u_i$ only by terms of weight greater than $v_i$. It and its inverse
+preserve the weighted filtration and induce inverse triangular maps
+on each finite coefficient packet.
+
+At $a_j$ form the finite-colength ideal
+\[
+ I_j=\left(t^{R/v_0},(u_1')^{R/v_1},\ldots,(u_m')^{R/v_m}\right).
+\]
+The points are distinct. These local ideals, together with the unit
+ideal away from the points, define a coherent ideal sheaf $I$ on $X$.
+For a branch through a center,
+\begin{equation}
+\label{geom:ideal-valuation}
+ \operatorname{ord}_P I
+ =\min_a\left\{(R/v_a)\operatorname{ord}_P z_a\right\}
+ =Rh_P,
+ \qquad z_0=t,\quad z_i=u_i'.
+\end{equation}
+Let $p:X'\to X$ be the ordinary blow-up of $I$, namely the relative
+Proj of its Rees algebra, and write
+\[
+ I\mathcal O_{X'}=\mathcal O_{X'}(-E).
+\]
+The scheme $X$ is integral and Noetherian, $I$ is a coherent nonzero
+ideal, and $E$ is an effective Cartier divisor. The tautological
+bundle $\mathcal O_{X'}(-E)$ is relatively ample; these are the
+standard blow-up properties in
+\cite[Tags~02OS, 02ND, and~02NS]{stacks}.
+
+Write $A=p^*L$ in additive divisor notation. We claim that
+\begin{equation}
+\label{geom:nef-class}
+ A-(1+\sigma)E\quad\text{is nef}.
+\end{equation}
+For a noncontracted integral curve $\Gamma$ upstairs whose image
+meets the affine chart, the map to its image is birational, since
+$p$ is an isomorphism away from the finite center. On the complete
+normalizations, \eqref{geom:projective-degree} and
+\eqref{geom:ideal-valuation} give
+\[
+ A\cdot\Gamma=R\deg_W p(\Gamma),\qquad
+ E\cdot\Gamma=R\sum_{P\mapsto a_j}h_P.
+\]
+Proposition~\ref{geom:curve-inequality} gives the desired nonnegative
+degree. A curve whose image misses the affine chart avoids the
+exceptional divisor. A contracted curve has $A$-degree zero and
+positive degree for $-E$ by relative ampleness. These cases account
+for every integral curve, proving \eqref{geom:nef-class}.
+
+For sufficiently large $a>1$, the divisor $aA-E$ is ample. One
+can see this directly: choose $b$ so that $I\otimes L^b$ is globally
+generated. The Rees construction embeds $X'$ in a product
+$X\times\mathbb P^r$, with the second hyperplane bundle restricting
+to $bA-E$. Tensoring with the first very ample bundle makes
+$(b+1)A-E$ ample. Now the identity
+\begin{equation}
+\label{geom:ample-combination}
+ A-E=
+ \frac{a-1}{a(1+\sigma)-1}\bigl(A-(1+\sigma)E\bigr)
+ +\frac{\sigma}{a(1+\sigma)-1}(aA-E)
+\end{equation}
+expresses $A-E$ as a positive multiple of a nef class plus a
+positive multiple of an ample class. It is therefore ample;
+see \cite[Corollary~1.4.10]{lazarsfeld}. This theorem applies to
+projective schemes and does not require a smooth blow-up.
+
+For all sufficiently large $n$, the graded-piece and relative
+vanishing theorems for the ordinary Rees algebra give
+\begin{equation}
+\label{geom:rees-pushdown}
+ p_*\mathcal O_{X'}(-nE)=I^n,\qquad
+ R^q p_*\mathcal O_{X'}(-nE)=0\quad(q>0).
+\end{equation}
+Indeed, on any affine open of the Noetherian base the Rees algebra
+is a Noetherian graded algebra generated in degree one. Its
+sufficiently high graded pieces recover the sections of its
+associated sheaf on Proj, and the higher cohomology of those twists
+vanishes. A finite affine cover gives one common threshold;
+see \cite[Tags~0AG6 and~0AG7]{stacks}. In particular,
+\eqref{geom:rees-pushdown} uses ordinary powers $I^n$, not their
+integral closures, and makes no assertion about small $n$.
+
+By the projection formula, Leray, and Serre vanishing for the ample
+line bundle $A-E$,
+\begin{equation}
+\label{geom:serre-vanishing}
+ H^1(X,I^n\otimes L^n)
+ =H^1(X',\mathcal O_{X'}(n(A-E)))=0
+\end{equation}
+for all sufficiently large $n$; see \cite[Tag~0B5U]{stacks}.
+The exact sequence for $I^n$ consequently gives a surjection from
+$H^0(X,L^n)$ onto all its local coefficient data modulo $I^n$.
+The constant projective coordinate trivializes $L$ on the affine
+chart. Finite-colength local quotients are unchanged by completion,
+so these algebraic classes are also the formal coefficient data used
+in the theorem. In these trivializations, every element of $I^n$ has
+weighted order at least $nR$, because every displayed generator
+of $I$ has weight $R$. Thus
+\begin{equation}
+\label{geom:ideal-inclusion}
+ I^n\subseteq\{\text{local series of weight at least }nR\}.
+\end{equation}
+Surjectivity modulo $I^n$ therefore implies surjectivity onto the
+smaller quotient consisting of the desired packets of weight less
+than $nR$. Equality in \eqref{geom:ideal-inclusion} is not needed.
+
+Finally, every section of $L^n$ for sufficiently large $n$ is
+supplied by a homogeneous degree-$n$ polynomial in the projective
+embedding coordinates. This follows from Serre vanishing applied
+to the homogeneous ideal sheaf of $X$ in its projective space.
+Such a polynomial restricts on the affine chart to one of
+$W$-degree at most $nR$. Taking $H=nR$ and undoing the filtered
+Taylor-polynomial coordinate change proves the surjectivity in
+\eqref{geom:jet-map}, and completes the proof of
+Theorem~\ref{geom:interpolation}.
+
+\section{The arithmetic and analytic determinant estimates}
+\label{det:section}
+
+Interpolation now supplies the algebraic rank needed for an
+interpolation determinant, in the sense of
+\cite[Section~6]{laurent1991}. We estimate one full-row minor from
+below arithmetically, and then translate its rows to exact logarithmic
+points to obtain an analytic upper bound.
+
+Throughout this section all parameters except $H$ are fixed.  Write
+\[
+ w\alpha=\sum_{i=1}^m w_i\alpha_i,
+ \qquad w_* =\min_{1\le i\le m}w_i,
+ \qquad \omega=\log 2.
+\]
+Let $\nu>2$, and suppose that integers $p_i$ and $q_i\ge2$ satisfy
+\begin{equation}
+ \left|\log 2-\frac{p_i}{q_i}\right|\le q_i^{-\nu},
+ \qquad w_i=\lceil\log q_i\rceil,
+ \qquad r_i=\frac{p_i}{q_i}
+ \quad(1\le i\le m).
+ \label{det:approximations}
+\end{equation}
+Assume that $p_i\ne0$ and that $m,K,w_0,v_0,\theta,w_1,\ldots,w_m$
+satisfy the hypotheses of Theorem~\ref{geom:interpolation}, with centers
+$y_j=2^j$ and $c_{ji}=jr_i$, $0\le j<K$.  In particular $w_i$ is a positive integer
+for $i>0$, while $w_0$ and $v_0$ are positive rational numbers.  Fix
+$F_0>2/\theta$, and put
+\begin{equation}
+ T_i=\left\lceil\frac{F_0w_i}{v_0}\right\rceil,
+ \qquad
+ G_i(t)=\sum_{1\le k<T_i}\frac{(-1)^{k+1}t^k}{k}.
+ \label{det:truncations}
+\end{equation}
+Empty sums are zero.  The first omitted term has weight
+$v_0T_i\ge F_0w_i>w_i/\theta$.  Consequently the substitution
+$u_i\mapsto u_i+G_i(t)-\log(1+t)$ is an invertible substitution preserving
+the weighted filtration.  It induces an invertible map on every finite
+space of coefficients of weight less than $H$.  Thus replacing the
+logarithms in Theorem~\ref{geom:interpolation} by these $G_i$ preserves
+surjectivity.
+
+\subsection{A full-row-rank minor and its arithmetic size}
+
+Use the monomials
+\[
+ P(Y,X)=Y^hX^\alpha,
+ \qquad h\in\ZZ_{\ge0},\quad \alpha\in\ZZ_{\ge0}^m,
+ \qquad w_0h+w\alpha\le H
+\]
+as columns, and the triples
+\[
+ \rho=(j,s,\beta),\qquad
+ 0\le j<K,\quad s\in\ZZ_{\ge0},\quad\beta\in\ZZ_{\ge0}^m,
+ \qquad v_0s+\frac{w\beta}{\theta}<H
+\]
+as rows.  The matrix entry is the coefficient of $t^su^\beta$ in
+\begin{equation}
+ P\bigl(2^j(1+t),jr_1+G_1(t)+u_1,\ldots,jr_m+G_m(t)+u_m\bigr).
+ \label{det:matrix}
+\end{equation}
+For all sufficiently large, sufficiently divisible $H$, choose a square
+minor $\Delta_H\ne0$ using every row, as permitted by
+Theorem~\ref{geom:interpolation}.  Denote its size by $M=M_H$, and set
+\begin{equation}
+ \bar b=\bar b_H=\frac{1}{MH}\sum_{\rho=(j,s,\beta)}w\beta.
+ \label{det:bbar}
+\end{equation}
+The elementary lattice count for a simplex gives
+\begin{equation}
+ M\sim
+ \frac{K\theta^mH^{m+1}}{(m+1)!\,v_0\prod_{i=1}^m w_i},
+ \qquad 0\le\bar b\le\theta.
+ \label{det:row-count}
+\end{equation}
+Indeed, after scaling by $H$, the lattice boxes of side lengths $H^{-1}$
+are Riemann sums for the fixed simplex.  Its volume is
+$\theta^m/((m+1)!v_0\prod_iw_i)$; its boundary has volume zero, so the
+strict inequality in the row definition does not affect the leading
+term.  We always let $H$ tend to infinity only after all the weights and
+centers have been fixed.
+
+\begin{lemma}[Arithmetic lower bound]\label{det:arithmetic}
+Let $\Lambda=4\log2$, and define
+\begin{equation}
+ E_{\rm ar}
+ =\frac{\Lambda F_0m}{v_0}
+  +\Lambda\sum_{i=1}^m\frac1{w_i}+\frac{\theta}{w_*}.
+ \label{det:arith-error}
+\end{equation}
+Then every minor just chosen satisfies
+\begin{equation}
+ \frac{\log|\Delta_H|}{MH}
+ \ge -(1-\bar b)-E_{\rm ar}.
+ \label{det:lower}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+Let $L_i=\operatorname{lcm}(1,\ldots,T_i-1)$, interpreted as $1$ if
+$T_i=1$, and put
+\[
+ D_H=\prod_{i=1}^m L_i^{\lfloor H/w_i\rfloor}.
+\]
+Scale a column $Y^hX^\alpha$ by $\prod_iq_i^{\alpha_i}$ and a row
+$(j,s,\beta)$ by $\prod_iq_i^{-\beta_i}$.  The scaled entry is zero
+unless $\alpha\ge\beta$ componentwise; otherwise it is
+\[
+ \prod_i\binom{\alpha_i}{\beta_i}
+ 2^{jh}[t^s](1+t)^h
+ \prod_i\bigl(q_i(jr_i+G_i(t))\bigr)^{\alpha_i-\beta_i}.
+\]
+Here $q_ijr_i=jp_i\in\ZZ$.  Since $G_i$ has coefficients in
+$L_i^{-1}\ZZ$, the denominator of this entry divides
+$\prod_iL_i^{\alpha_i-\beta_i}$, which divides $D_H$.  Thus multiplying
+every entry of the scaled matrix by $D_H$ gives a matrix over
+$\ZZ$ with nonzero determinant.  A nonzero integer has
+modulus at least one, so
+\begin{equation}
+ \begin{aligned}
+ \log|\Delta_H|
+ &\ge -M\log D_H
+      -\sum_{\text{columns }\alpha}\sum_i\alpha_i\log q_i\\
+ &\quad+\sum_{\text{rows }\beta}\sum_i\beta_i\log q_i.
+ \end{aligned}
+ \label{det:clearing}
+\end{equation}
+For each selected column, $\sum_i\alpha_i\log q_i\le w\alpha\le H$.
+Also $0\le w_i-\log q_i<1$, and hence
+\[
+ \sum_{\text{rows }\beta}\sum_i\beta_i\log q_i
+ \ge MH\bar b-\sum_{\text{rows }\beta}\sum_i\beta_i
+ \ge MH\bar b-\frac{MH\theta}{w_*}.
+\]
+
+For completeness, $\log\operatorname{lcm}(1,\ldots,n)\le\Lambda n$.
+To see this, the factorial valuation formula shows that each prime
+power in $(\ell,2\ell]$ contributes its logarithmic prime weight to
+$\log\binom{2\ell}{\ell}$; all the other contributions to the latter
+are nonnegative.  Thus the increase of the log least common multiple
+across this interval is at most $2\ell\log2$.  Summing over dyadic
+intervals up to the smallest power of two above $n$ gives at most
+$4n\log2$.  Therefore
+\[
+ \frac{\log D_H}{H}
+ \le\Lambda\sum_i\frac{T_i}{w_i}
+ \le\frac{\Lambda F_0m}{v_0}+\Lambda\sum_i\frac1{w_i}.
+\]
+Substitution in \eqref{det:clearing} proves \eqref{det:lower}.
+\end{proof}
+
+\subsection{Translation to entire functions}
+
+For every multi-index $a\in\ZZ_{\ge0}^m$ and every selected column $P$,
+define the entire function
+\begin{equation}
+ f_{a,P}(z)=[u^a]P(e^z,z+u_1,\ldots,z+u_m).
+ \label{det:test-functions}
+\end{equation}
+We regard $(f_{a,P})_P$ as a row vector of entire functions, indexed by
+the selected columns.  For $P=Y^hX^\alpha$ it has the explicit entry
+\begin{equation}
+ f_{a,P}(z)=
+ \begin{cases}
+ \displaystyle\binom{\alpha}{a}e^{hz}z^{|\alpha|-|a|},&a\le\alpha,\\
+ 0,&\text{otherwise}.
+ \end{cases}
+ \label{det:test-monomials}
+\end{equation}
+In particular only indices $a$ with $wa\le H$ can contribute.
+
+\begin{lemma}[Exact row translation]\label{det:translation}
+Every row $\rho=(j,s,\beta)$ of \eqref{det:matrix} is a sum of at most
+\begin{equation}
+ Q_H=(\lfloor H\rfloor+1)^{2m}
+          (\lfloor H/v_0\rfloor+1)
+ \label{det:term-count}
+\end{equation}
+scalar multiples of row vectors of the form
+\[
+ \bigl([t^\ell]f_{a,P}(j\omega+\log(1+t))\bigr)_P,
+ \qquad a\ge\beta,\quad wa\le H,\quad0\le\ell\le s.
+\]
+Each scalar $\xi$ occurring with index $a$ satisfies
+\begin{equation}
+ \begin{aligned}
+ |\xi|&\le\exp\{-\nu w(a-\beta)+H E_{\rm tr}\},\\
+ E_{\rm tr}
+ &=\frac{\nu}{F_0}+\frac{\log2}{v_0}
+   +\frac{\log4+\log(2K)+\nu}{w_*}.
+ \end{aligned}
+ \label{det:translation-bound}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+Put
+\[
+ \epsilon_i=j(r_i-\omega),\qquad
+ \tau_i(t)=G_i(t)-\log(1+t).
+\]
+Since $e^{j\omega}=2^j$, the substitutions in \eqref{det:matrix} can be
+written as $Y=e^z$, $X_i=z+u_i+\epsilon_i+\tau_i(t)$, where
+$z=j\omega+\log(1+t)$.  Expanding first in the variables $u_i$, then
+in the constants $\epsilon_i$ and tails $\tau_i$, gives the exact row
+vector identity
+\begin{align}
+ \text{row}_{j,s,\beta}
+ ={}&\sum_{\substack{a\ge\beta\\wa\le H}}
+       \binom a\beta
+       \sum_{0\le d\le a-\beta}\binom{a-\beta}{d}
+       \epsilon^{a-\beta-d}
+       \sum_{k=0}^s
+       \left([t^k]\prod_i\tau_i(t)^{d_i}\right)
+ \nonumber\\[-2pt]
+ &\hspace{35mm}\cdot
+ \bigl([t^{s-k}]f_{a,P}(j\omega+\log(1+t))\bigr)_P.
+ \label{det:row-identity}
+\end{align}
+All scalar factors in this identity are independent of the column
+$P$.  This is therefore an identity to which determinant
+multilinearity applies directly.
+
+The product of tails vanishes to order at least $\sum_i d_iT_i$.
+Consequently a nonzero coefficient in \eqref{det:row-identity}
+satisfies
+\begin{equation}
+ \sum_i d_iw_i\le\frac{v_0}{F_0}\sum_i d_iT_i
+ \le\frac{v_0s}{F_0}<\frac{H}{F_0}.
+ \label{det:tail-budget}
+\end{equation}
+On $|t|=1/2$,
+\[
+ |\tau_i(t)|
+ \le\sum_{k\ge T_i}\frac{2^{-k}}k\le1.
+\]
+Cauchy's coefficient estimate thus bounds the tail coefficient in
+\eqref{det:row-identity} by $2^k\le2^s$.  From
+\eqref{det:approximations},
+\[
+ |\epsilon_i|\le2Kq_i^{-\nu}
+ \le2K e^\nu e^{-\nu w_i}.
+\]
+Moreover
+$\binom a\beta\binom{a-\beta}{d}\le4^{|a|}$ and
+$|a|\le H/w_*$.  Combining these inequalities and using
+\eqref{det:tail-budget} gives
+\[
+ \log|\xi|
+ \le-\nu w(a-\beta)+\frac{\nu H}{F_0}
+       +\frac{H\log2}{v_0}
+       +\frac{H(\log4+\log(2K)+\nu)}{w_*}
+\]
+for each nonzero scalar.  A zero scalar obeys the required bound as
+well.  Finally, each coordinate of $a$ and $d$ is at most $H$ because
+$w_i\ge1$, while $0\le k\le H/v_0$.  This proves the term count and
+the Lemma.
+\end{proof}
+
+\subsection{Repeated Taylor degrees force a quadratic saving}
+
+The Taylor expansion of interpolation determinants eliminates repeated
+degrees \cite[Theorem~1]{laurent2000}. Our rows fall into different
+transverse-index groups, so this cancellation is used only inside a
+fixed group. The next bound is uniform over all row choices.
+
+\begin{lemma}[Collision estimate]\label{det:collision}
+Choose one translated test row from each row expansion in
+Lemma~\ref{det:translation}, and remove its scalar factor.  Let $T$ be
+the resulting square matrix, and let $n_a$ be the number of its rows
+with index $a$.  With
+\begin{equation}
+ c=\frac{\log2}{4},\qquad
+ E_{\rm hol}=\frac{100K}{w_0}+\frac{\log2}{v_0}
+             +\frac{\log(200K)}{w_*},
+ \label{det:hol-error}
+\end{equation}
+there is a quantity $\rho_H\to0$, independent of all these row
+choices and of the selected columns, such that
+\begin{equation}
+ |\det T|
+ \le\exp\left\{-c\sum_a n_a^2+MH(E_{\rm hol}+\rho_H)\right\}.
+ \label{det:collision-bound}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+Put $R=100K$.  Equation~\eqref{det:test-monomials} gives, on $|z|\le R$,
+\[
+ |f_{a,P}(z)|\le
+ \exp\left\{H\left(\frac R{w_0}
+                      +\frac{\log(2R)}{w_*}\right)\right\}
+ =:\mathcal D_H.
+\]
+Expand
+\[
+ f_{a,P}(z)=\sum_{d\ge0}c_{a,d,P}(z/R)^d.
+\]
+Cauchy's estimate gives $|c_{a,d,P}|\le\mathcal D_H$.  A row of $T$ is
+a test of order $\ell\le s$ at some center $j$.  Since
+\[
+ |j\omega+\log(1+t)|
+ \le(K-1)\log2+\log2<50K=R/2
+ \qquad(|t|=1/2),
+\]
+its value on $(z/R)^d$ has modulus at most $2^\ell2^{-d}$.
+
+Expand the determinant in these power-series rows.  The expansion is
+absolutely convergent: a coefficient determinant has modulus at most
+$M!\mathcal D_H^M$, and the sum of the product bounds $2^{-d}$ over
+all degrees is finite.  If two rows have the same pair $(a,d)$, their
+coefficient vectors $(c_{a,d,P})_P$ agree, and that summand vanishes.
+Thus every nonzero summand has distinct degrees within each group
+$a$, and so
+\[
+ \sum_{\text{rows}}d\ge\sum_a\binom{n_a}{2}.
+\]
+Use half of the geometric decay for this lower bound and sum the
+other half freely over all nonnegative degrees.  Since
+$\sum\ell\le MH/v_0$, this gives
+\[
+ |\det T|
+ \le M!\mathcal D_H^M2^{MH/v_0}
+       2^{-\frac12\sum_a\binom{n_a}{2}}
+       (1-2^{-1/2})^{-M}.
+\]
+Because $\sum_a n_a=M$, the asserted inequality follows with, for
+example,
+\[
+ \rho_H=\frac{\log M+\frac14\log2
+                    -\log(1-2^{-1/2})}{H}.
+\]
+Equation~\eqref{det:row-count} shows that $\rho_H\to0$ with the fixed
+parameters stipulated above.
+\end{proof}
+
+\subsection{A comparison with two alternatives}
+
+Put
+\begin{equation}
+ E_{\rm an}=E_{\rm tr}+E_{\rm hol}.
+ \label{det:analytic-error}
+\end{equation}
+
+Let $0<A<1$ set a cutoff $AH$ for transverse weights, and let
+$0<\eta<1$ be a fraction of rows. The main arithmetic cost is
+$1-\bar b$. In each term of the determinant expansion, if at least
+$\eta M$ rows have $wa\le AH$, they give a collision saving;
+otherwise the rows with $wa>AH$ supply approximation-error factors.
+We seek a saving larger than $1-\bar b+E_{\rm ar}+E_{\rm an}$, and
+choose $A$ and $\eta$ in Section~\ref{sec:parameters}.
+
+\begin{proposition}[Determinant comparison]\label{det:comparison}
+Let $0<A<1$ and $0<\eta<1$, and define
+\begin{equation}
+ g=\nu\bigl(A(1-\eta)-\theta\bigr)-(1-\theta),
+ \qquad
+ L=\frac{\eta^2K\theta^m}{(m+1)v_0A^m}.
+ \label{det:budgets}
+\end{equation}
+The approximations \eqref{det:approximations} and the interpolation
+hypotheses cannot hold simultaneously if
+\begin{equation}
+ g>0,\qquad
+ E_{\rm ar}+E_{\rm an}<g,
+ \qquad
+ cL>1+E_{\rm ar}+E_{\rm an}.
+ \label{det:contradiction-conditions}
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+Let
+\[
+ D_A(H)=\#\{a\in\ZZ_{\ge0}^m:wa\le AH\},
+ \qquad L_H=\frac{\eta^2M}{H D_A(H)}.
+\]
+The simplex count, now in dimension $m$, and
+\eqref{det:row-count} show that
+\[
+ D_A(H)\sim\frac{(AH)^m}{m!\prod_iw_i},
+ \qquad L_H\longrightarrow L.
+\]
+Expand $\Delta_H$ by the row identities in
+Lemma~\ref{det:translation}.  For a choice of terms with indices
+$a_\rho$, the product of their scalar factors has modulus at most
+\[
+ \exp\left\{-\nu\sum_\rho wa_\rho
+             +\nu MH\bar b+MH E_{\rm tr}\right\}.
+\]
+There are at most $Q_H^M$ term choices.  Apply
+Lemma~\ref{det:collision} to each one.
+
+Suppose first that at least $\eta M$ of its indices obey $wa\le AH$.
+There are at most $D_A(H)$ such indices, so Cauchy--Schwarz gives
+\[
+ \sum_a n_a^2\ge\frac{(\eta M)^2}{D_A(H)}=MH L_H.
+\]
+The scalar main exponent $-\nu\sum_\rho w(a_\rho-\beta_\rho)$ is
+nonpositive, because $a_\rho\ge\beta_\rho$.  Discarding it leaves
+an upper bound $-cL_H+E_{\rm an}+\rho_H$ after division by $MH$.
+
+In the other case, more than $(1-\eta)M$ indices have $wa>AH$.
+Hence $\sum_\rho wa_\rho\ge MH A(1-\eta)$.  Discarding the
+nonpositive collision term leaves the upper bound
+$-\nu(A(1-\eta)-\bar b)+E_{\rm an}+\rho_H$.
+Taking absolute values before summing the determinant expansion gives
+\begin{equation}
+ \begin{aligned}
+ \frac{\log|\Delta_H|}{MH}
+ &\le E_{\rm an}+\varepsilon_H+
+       \max\{-cL_H,-\nu(A(1-\eta)-\bar b)\},\\
+ \varepsilon_H&=\rho_H+\frac{\log Q_H}{H}\longrightarrow0.
+ \end{aligned}
+ \label{det:upper}
+\end{equation}
+All bounds here are uniform over the row-term choices.
+
+For the second alternative, the gap between the two main exponents
+is at least $g$, since $\bar b\le\theta$ gives
+\[
+ \nu(A(1-\eta)-\bar b)-(1-\bar b)
+ =\nu A(1-\eta)-1-(\nu-1)\bar b\ge g.
+\]
+Under \eqref{det:contradiction-conditions}, both quantities inside the
+maximum in \eqref{det:upper}, after adding
+$E_{\rm an}+\varepsilon_H$, are strictly less than
+$-(1-\bar b)-E_{\rm ar}$ for all sufficiently large $H$.  For the
+first quantity, use $L_H\to L$ and $1-\bar b\le1$; for the second,
+use the displayed uniform gap.  This contradicts
+Lemma~\ref{det:arithmetic}.
+\end{proof}
+
+\section{Choice of parameters and proof of Theorem~\ref{thm:main}}
+\label{sec:parameters}
+
+We now combine the interpolation theorem and the determinant estimates.
+The order of choices is essential: the dimension is fixed before the
+approximation scales, and all these data are fixed before the polynomial
+degree tends to infinity.
+
+\begin{lemma}\label{par:constants}
+For every real \(\nu>2\), there are positive rational numbers
+\(\theta,A,B,C\) such that
+\begin{equation}\label{par:inequalities}
+0<\theta<A<B<1,\qquad
+\nu(A-\theta)>1-\theta,\qquad
+C>1,\quad B<1/C,\quad B<C\theta<1.
+\end{equation}
+One can then choose \(0<\eta<1\) such that
+\begin{equation}\label{par:gap}
+g:=\nu\bigl(A(1-\eta)-\theta\bigr)-(1-\theta)>0.
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+Choose a rational \(b\) with \(1/2<b<1-1/\nu\).
+For a sufficiently small positive rational \(\delta\), put
+\(\theta=1-\delta\) and \(A=1-b\delta\). Then \(0<\theta<A<1\), and
+\[
+\nu(A-\theta)-(1-\theta)
+=\bigl(\nu(1-b)-1\bigr)\delta>0,
+\]
+whereas
+\[
+\theta-A^2=(2b-1)\delta-b^2\delta^2>0.
+\]
+It follows that the interval \((A/\theta,1/A)\) is nonempty.
+Choose a rational \(C\) in this interval. Since \(A>\theta\), we have
+\(C>1\); since \(\theta<A\), we also have
+\(C\theta<\theta/A<1\).
+Now choose a rational \(B\) between \(A\) and
+\(\min(1/C,C\theta)\). This proves \eqref{par:inequalities}.
+Finally, the strict inequality at \(\eta=0\) allows a sufficiently
+small \(\eta>0\) in \eqref{par:gap}.
+\end{proof}
+
+The two inequalities used in this construction have different roles.
+The inequality \(\nu(A-\theta)>1-\theta\) supplies the
+approximation-error gap. The inequality \(A^2<\theta\) permits
+\(A/\theta<C<1/A\), and hence a choice of \(B\) for which
+\(CB<1\), \(C\theta/B>1\), and \(B/A>1\). With the full-simplex
+counts of Section~\ref{det:section}, these three ratios make the
+dimension-dependent errors tend to zero while the collision saving
+tends to infinity. We now choose one finite dimension realizing
+both requirements; it will remain fixed throughout the degree limit.
+
+\begin{proof}[Proof of Theorem~\ref{thm:main}]
+Fix \(\nu>2\). Suppose for a contradiction that there are arbitrarily
+large positive integers \(q\) for which some \(p\in\ZZ\) satisfies
+\begin{equation}\label{par:good}
+\left|\log 2-\frac pq\right|\le q^{-\nu}.
+\end{equation}
+Fix \(\theta,A,B,C,\eta,g\) from Lemma~\ref{par:constants}, and put
+\(\varepsilon_0=\min(g/2,1/2)\).
+First choose \(F_0>2/\theta\) so large that
+\(\nu/F_0<\varepsilon_0/3\).
+
+For an integer \(m\), set
+\begin{equation}\label{par:dimension}
+K=\lfloor C^m\rfloor,\qquad
+w_0=B^{-m},\qquad
+v_0=2K\theta^m w_0.
+\end{equation}
+These are admissible rational interpolation data:
+\begin{equation}\label{par:volume}
+K\theta^m\le(C\theta)^m<1,\qquad
+K\frac{w_0}{v_0}\theta^m=\frac12.
+\end{equation}
+The relevant limits as \(m\to\infty\) are
+\begin{equation}\label{par:limits}
+\frac{K}{w_0}\le(CB)^m\longrightarrow0,\qquad
+v_0\sim2\left(\frac{C\theta}{B}\right)^m\longrightarrow\infty,
+\qquad
+\frac{m}{v_0}\longrightarrow0.
+\end{equation}
+With the notation of Proposition~\ref{det:comparison}, these choices give
+\begin{equation}\label{par:collision-growth}
+L=\frac{\eta^2K\theta^m}{(m+1)v_0A^m}
+ =\frac{\eta^2(B/A)^m}{2(m+1)}\longrightarrow\infty.
+\end{equation}
+Thus, with \(\Lambda=4\log2\) and \(c=(\log2)/4\), choose \(m\) large
+enough that
+\begin{equation}\label{par:dimension-margin}
+\frac{\Lambda F_0m+2\log2}{v_0}+\frac{100K}{w_0}
+ <\frac{\varepsilon_0}{3},
+\qquad cL>2.
+\end{equation}
+Fix this \(m\), and hence \(K,w_0,v_0\).
+
+The remaining constants are now fixed. Choose approximations
+\(p_i/q_i\) satisfying \eqref{par:good}, with
+\(w_i=\lceil\log q_i\rceil\), successively sufficiently large for
+Theorem~\ref{geom:interpolation} and, in addition, for
+\begin{equation}\label{par:weight-margin}
+\Lambda\sum_{i=1}^m\frac1{w_i}
++\frac{\theta+\log4+\log(2K)+\nu+\log(200K)}{w_*}
+ <\frac{\varepsilon_0}{3},
+\qquad w_*=\min_{i>0}w_i.
+\end{equation}
+This is possible: first impose a sufficiently large lower bound on
+every \(w_i\), using \(\sum_i1/w_i\le m/w_*\), and then impose the
+successive geometric thresholds. The assumed denominators are
+unbounded, so every finite sequence of such requirements can be met.
+The thresholds for weight separation are independent of the centers.
+Taking each \(q_i\) sufficiently large ensures \(p_i\ne0\), since
+\(q_i^{-\nu}<\log2\). The centers are \(y_j=2^j\), \(c_{ji}=jr_i\), and \(r_i=p_i/q_i\).
+The \(y_j\) are nonzero and pairwise distinct, as required by the
+modified interpolation theorem. The thresholds are independent of
+both the \(y_j\) and \(c_{ji}\).
+
+Using \eqref{det:arith-error}, \eqref{det:translation-bound},
+\eqref{det:hol-error}, and \eqref{det:analytic-error}, the sum of errors
+is exactly
+\[
+\begin{aligned}
+E_{\rm ar}+E_{\rm an}
+&=\frac{\nu}{F_0}
+ +\frac{\Lambda F_0m+2\log2}{v_0}+\frac{100K}{w_0}\\
+&\quad +\Lambda\sum_i\frac1{w_i}
+ +\frac{\theta+\log4+\log(2K)+\nu+\log(200K)}{w_*}.
+\end{aligned}
+\]
+Our three choices make this less than \(\varepsilon_0\).
+In particular it is less than \(g\), while
+\(cL>2>1+E_{\rm ar}+E_{\rm an}\).
+All hypotheses of Proposition~\ref{det:comparison} now hold,
+a contradiction. The degree \(H\) in that Proposition tends to infinity
+only after the dimension, weights, and centers just chosen are fixed.
+
+We have excluded \eqref{par:good} for arbitrarily large \(q\), for
+each fixed \(\nu>2\). This gives the required eventual lower bound,
+in fact with a strict inequality. The contradiction allowed unreduced
+fractions and zero error. If \(\log 2\) were rational, exact representations
+with arbitrarily large denominators would contradict it; hence
+\(\log 2\) is irrational.
+
+Finally divide the unit interval into \(N\) equal parts and apply
+pigeonhole to \(0,\log 2,\ldots,N\log 2\) modulo one. There exist \(p\in\ZZ\)
+and \(1\le q\le N\) such that
+\[
+0<\left|\log 2-\frac pq\right|\le\frac1{qN}\le\frac1{q^2}.
+\]
+After reduction, the same error is at most the inverse square of the
+reduced denominator. These errors tend to zero as \(N\to\infty\);
+irrationality forces the reduced denominators to be unbounded.
+Every exponent less than two therefore occurs infinitely often in
+the defining inequality. Hence \(\mu(\log 2)\ge2\), and the upper bound
+already proved gives \(\mu(\log 2)=2\).
+\end{proof}
+
+
+
+% SPDX-License-Identifier: Apache-2.0
+% Candidate extension; insert after the log 2 parameter argument.
+\section{Extension to positive rational logarithms}
+\label{rat:section}
+
+This section belongs to the candidate derivation.  Its principal
+conclusion and its corollaries are conditional on
+Theorem~\ref{geom:interpolation}, including the assertion that its
+successive weight thresholds are independent of the interpolation
+centers.  The following argument records all changes needed for a
+positive rational base; it does not certify the proposed geometric
+interpolation theorem or claim a new unconditional result.
+
+\begin{theorem}[Conditional rational-logarithm extension; candidate]
+\label{rat:main}
+Assume Theorem~\ref{geom:interpolation} with its stated quantifiers.
+For every fixed $a\in\QQ_{>0}\setminus\{1\}$ and every real $\nu>2$,
+there is an integer $Q(a,\nu)$ such that
+\begin{equation}
+ \left|\log a-\frac pq\right|>q^{-\nu}
+ \qquad(p\in\ZZ,\ q\in\ZZ,\ q\ge Q(a,\nu)).
+ \label{rat:eventual-bound}
+\end{equation}
+Here fractions need not be reduced, and $\log$ is the real natural
+logarithm.  In particular, conditionally on that interpolation
+statement, $\log a$ is irrational and $\mu(\log a)=2$.
+\end{theorem}
+
+We first give the determinant estimates for this fixed base.  Write
+$a=u/v$ in lowest terms, with positive integers $u,v$, and put
+$\omega=\log a$.  Fix interpolation data
+$m,K,w_0,v_0,\theta,w_1,\ldots,w_m$ satisfying the hypotheses of
+Theorem~\ref{geom:interpolation}.  Suppose that
+\begin{equation}
+ \left|\omega-\frac{p_i}{q_i}\right|\le q_i^{-\nu},\qquad
+ q_i\ge2,\qquad w_i=\lceil\log q_i\rceil,\qquad
+ r_i=p_i/q_i \quad(1\le i\le m).
+ \label{rat:approximations}
+\end{equation}
+Set $w\alpha=\sum_iw_i\alpha_i$ and $w_*=\min_iw_i$.  The centers
+$y_j=a^j$, $c_{ji}=jr_i$, $0\le j<K$, have nonzero, pairwise distinct
+$y_j$, since $a>0$ and $a\ne1$.  This is true when $a<1$ as well.
+
+Choose $F_0>2/\theta$ and define
+\begin{equation}
+ T_i=\left\lceil F_0w_i/v_0\right\rceil,\qquad
+ G_i(t)=\sum_{1\le k<T_i}\frac{(-1)^{k+1}t^k}{k},\qquad
+ L_i=\lcm(1,\ldots,T_i-1),\qquad
+ D_H=\prod_iL_i^{\lfloor H/w_i\rfloor}.
+ \label{rat:truncations}
+\end{equation}
+An empty sum is zero, and $L_i=1$ when $T_i=1$.
+Since $v_0T_i\ge F_0w_i>w_i/\theta$, the substitution
+$U_i\mapsto U_i+G_i(t)-\log(1+t)$ and its inverse preserve the
+$V$-weighted filtration, where
+$V=(v_0,w_1/\theta,\ldots,w_m/\theta)$.
+It therefore induces an automorphism on every coefficient packet of
+weight less than $H$.  Interpolation remains surjective after replacing
+each $\log(1+t)$ by $G_i(t)$.
+
+Use columns $P=Y^hX^\alpha$ with $w_0h+w\alpha\le H$, and rows
+$\rho=(j,s,\beta)$ with
+$0\le j<K$ and $v_0s+w\beta/\theta<H$.  The entry is
+\begin{equation}
+ A_{\rho;h,\alpha}
+ =[t^sU^\beta]
+ P\bigl(a^j(1+t),(jr_i+G_i(t)+U_i)_{i=1}^m\bigr).
+ \label{rat:matrix}
+\end{equation}
+For all sufficiently large, sufficiently divisible $H$, interpolation
+supplies a nonzero square minor $\Delta_H$ using every row.  Let $M=M_H$
+be its size and put
+\begin{equation}
+ \bar b=\frac{1}{MH}\sum_{\rho=(j,s,\beta)}w\beta,
+ \qquad
+ M\sim\frac{K\theta^mH^{m+1}}
+ {(m+1)!v_0\prod_iw_i},\qquad 0\le\bar b\le\theta.
+ \label{rat:row-count}
+\end{equation}
+The count follows by the simplex-volume argument used in
+\eqref{det:row-count}; the strict row inequality has the same leading
+term.  Every limit in $H$ below keeps all the other data fixed.
+
+\subsection{Exact arithmetic clearing for a rational base}
+
+\begin{lemma}[Rational-base arithmetic estimate]
+\label{rat:arithmetic}
+If $w_0\ge(K-1)\log v$, then
+\begin{equation}
+ \frac{\log|\Delta_H|}{MH}\ge-(1-\bar b)-E_{\rm ar},
+ \qquad
+ E_{\rm ar}=\frac{\Lambda F_0m}{v_0}
+  +\Lambda\sum_i\frac1{w_i}+\frac{\theta}{w_*},
+ \qquad\Lambda=4\log2.
+ \label{rat:lower}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+Scale the column $Y^hX^\alpha$ by
+$v^{(K-1)h}\prod_iq_i^{\alpha_i}$ and the row $(j,s,\beta)$ by
+$\prod_iq_i^{-\beta_i}$.  Its scaled entry is zero unless
+$\alpha\ge\beta$ componentwise; otherwise it is exactly
+\begin{equation}
+ u^{jh}v^{(K-1-j)h}\prod_i\binom{\alpha_i}{\beta_i}
+ [t^s](1+t)^h
+ \prod_i\bigl(jp_i+q_iG_i(t)\bigr)^{\alpha_i-\beta_i}.
+ \label{rat:scaled-entry}
+\end{equation}
+Both exponents on $u$ and $v$ are nonnegative.  The denominator of
+this entry divides $\prod_iL_i^{\alpha_i-\beta_i}$, which divides
+$D_H$.  Multiplying every scaled entry by $D_H$ gives an integer
+matrix with nonzero determinant.  Hence
+\begin{equation}
+\begin{aligned}
+ \log|\Delta_H|\ge{}&-M\log D_H
+ -\sum_{\text{selected columns }(h,\alpha)}
+       \left((K-1)h\log v+\sum_i\alpha_i\log q_i\right)\\
+ &+\sum_{\text{rows }(j,s,\beta)}\sum_i\beta_i\log q_i.
+\end{aligned}
+\label{rat:clearing}
+\end{equation}
+This is the exact clearing inequality; the numerator $u$ requires no
+additional factor.
+For every selected column, $\log q_i\le w_i$ and the hypothesis on
+$w_0$ give
+\[
+ (K-1)h\log v+\sum_i\alpha_i\log q_i
+ \le w_0h+w\alpha\le H.
+\]
+Since $0\le w_i-\log q_i<1$ and $w\beta<\theta H$, the row contribution
+is at least
+\[
+ MH\bar b-\sum_{\text{rows}}|\beta|
+ \ge MH\bar b-MH\theta/w_*.
+\]
+The elementary least-common-multiple bound
+$\log\lcm(1,\ldots,n)\le\Lambda n$, established in the proof of
+Lemma~\ref{det:arithmetic}, gives
+\[
+ \frac{\log D_H}{H}
+ \le\Lambda\sum_i\frac{T_i}{w_i}
+ \le\frac{\Lambda F_0m}{v_0}+\Lambda\sum_i\frac1{w_i}.
+\]
+Substitution in \eqref{rat:clearing} proves \eqref{rat:lower}.
+\end{proof}
+
+\subsection{Translation and analytic collision with either sign}
+
+For a transverse multi-index $\gamma$, let
+\[
+ f_{\gamma,P}(z)=[U^\gamma]P(e^z,z+U_1,\ldots,z+U_m).
+\]
+These entire functions have entries
+$\binom\alpha\gamma e^{hz}z^{|\alpha|-|\gamma|}$ when
+$\gamma\le\alpha$, and zero otherwise.
+Put $\epsilon_i=j(r_i-\omega)$, $\tau_i=G_i-\log(1+t)$ and
+$z=j\omega+\log(1+t)$.  Because $e^{j\omega}=a^j$, direct expansion
+gives the row-vector identity
+\begin{equation}
+\begin{aligned}
+ \operatorname{row}_{j,s,\beta}
+ ={}&\sum_{\substack{\gamma\ge\beta\\w\gamma\le H}}
+       \binom\gamma\beta
+       \sum_{0\le d\le\gamma-\beta}\binom{\gamma-\beta}{d}
+       \epsilon^{\gamma-\beta-d}
+       \sum_{k=0}^s
+       \left([t^k]\prod_i\tau_i(t)^{d_i}\right)\\
+ &\hspace{23mm}\cdot
+       \bigl([t^{s-k}]f_{\gamma,P}(j\omega+\log(1+t))\bigr)_P.
+\end{aligned}
+\label{rat:row-identity}
+\end{equation}
+All its scalar coefficients are independent of $P$.  The identity has
+at most
+\[
+ Q_H=(\lfloor H\rfloor+1)^{2m}(\lfloor H/v_0\rfloor+1)
+\]
+terms, because $w_i\ge1$.  Each nonzero tail coefficient has
+$\sum_id_iT_i\le k\le s$, hence
+$\sum_id_iw_i<H/F_0$.  On $|t|=1/2$, $|\tau_i(t)|\le1$;
+Cauchy's estimate bounds its product's $t^k$ coefficient by $2^k$.
+Furthermore
+$|\epsilon_i|\le2Ke^\nu e^{-\nu w_i}$ and
+$\binom\gamma\beta\binom{\gamma-\beta}{d}\le4^{|\gamma|}$.
+Consequently every scalar $\xi$ with index $\gamma$ satisfies
+\begin{equation}
+ |\xi|\le\exp\{-\nu w(\gamma-\beta)+H E_{\rm tr}\},
+ \qquad
+ E_{\rm tr}=\frac{\nu}{F_0}+\frac{\log2}{v_0}
+       +\frac{\log4+\log(2K)+\nu}{w_*}.
+ \label{rat:translation-bound}
+\end{equation}
+The argument uses absolute values throughout, so it does not require
+$\omega>0$ or any sign condition on the $p_i$.
+
+Set
+\begin{equation}
+ R_a=4K(1+|\log a|),\qquad c=\frac{\log2}{4},\qquad
+ E_{{\rm hol},a}=\frac{R_a}{w_0}+\frac{\log2}{v_0}
+                   +\frac{\log(2R_a)}{w_*}.
+ \label{rat:hol-error}
+\end{equation}
+Choose one test row from each row expansion, remove its scalar, and
+write $n_\gamma$ for the number of resulting rows with index $\gamma$.
+For the resulting matrix $T$, we claim
+\begin{equation}
+ |\det T|\le
+ \exp\left\{-c\sum_\gamma n_\gamma^2
+                 +MH(E_{{\rm hol},a}+\rho_H)\right\},
+ \qquad\rho_H\longrightarrow0,
+ \label{rat:collision}
+\end{equation}
+uniformly over its row choices and the selected columns.
+Indeed, on $|z|\le R_a$ the monomial formula gives
+\[
+ |f_{\gamma,P}(z)|\le
+ \exp\left\{H\left(\frac{R_a}{w_0}
+                       +\frac{\log(2R_a)}{w_*}\right)\right\}
+ =:\mathcal D_H.
+\]
+Write $f_{\gamma,P}(z)=\sum_{d\ge0}c_{\gamma,d,P}(z/R_a)^d$;
+then $|c_{\gamma,d,P}|\le\mathcal D_H$.
+The logarithm in the test is its analytic germ on $|t|<1$.
+Its power series gives $|\log(1+t)|\le\log2$ on $|t|=1/2$, so
+\[
+ |j\omega+\log(1+t)|
+ \le(K-1)|\omega|+\log2<R_a/2.
+\]
+Thus a test of order $\ell\le s$ on $(z/R_a)^d$ has modulus at most
+$2^\ell2^{-d}$.  The determinant expansion in these series is absolutely
+convergent, since each coefficient determinant is bounded by
+$M!\mathcal D_H^M$ and the geometric series converge.
+Any summand with two equal pairs $(\gamma,d)$ vanishes, since its two
+coefficient rows coincide.  Every remaining summand therefore has
+$\sum_{\text{rows}}d\ge\sum_\gamma\binom{n_\gamma}{2}$.
+Use half of the factor $2^{-\sum d}$ for this saving and sum the other
+half freely.  Since $\sum\ell\le MH/v_0$, this yields
+\[
+ |\det T|\le M!\mathcal D_H^M2^{MH/v_0}
+  2^{-\frac12\sum_\gamma\binom{n_\gamma}{2}}
+  (1-2^{-1/2})^{-M}.
+\]
+Equation~\eqref{rat:collision} follows, for example with
+\[
+ \rho_H=\frac{\log M+\frac14\log2
+                       -\log(1-2^{-1/2})}{H}\longrightarrow0,
+\]
+where \eqref{rat:row-count} gives the limit.
+
+For $0<A<1$ and $0<\eta<1$, put
+\begin{equation}
+ g=\nu\bigl(A(1-\eta)-\theta\bigr)-(1-\theta),\qquad
+ L=\frac{\eta^2K\theta^m}{(m+1)v_0A^m},\qquad
+ E_a=E_{\rm ar}+E_{\rm tr}+E_{{\rm hol},a}.
+ \label{rat:budgets}
+\end{equation}
+The contradiction conditions are exactly
+\begin{equation}
+ w_0\ge(K-1)\log v,\qquad g>0,\qquad E_a<g,
+ \qquad cL>1+E_a.
+ \label{rat:conditions}
+\end{equation}
+Here is the full comparison.  Define
+$D_A(H)=\#\{\gamma\in\NN^m:w\gamma\le AH\}$ and
+$L_H=\eta^2M/(HD_A(H))$.  Simplex counts give
+$D_A(H)\sim(AH)^m/(m!\prod_iw_i)$ and $L_H\to L$.
+In one term of the multilinear expansion of $\Delta_H$, if at least
+$\eta M$ indices have $w\gamma\le AH$, then
+$\sum n_\gamma^2\ge(\eta M)^2/D_A(H)=MH L_H$.
+The scalar main exponent $-\nu\sum w(\gamma-\beta)$ is nonpositive,
+so this term has normalized logarithmic upper bound
+$-cL_H+E_{\rm tr}+E_{{\rm hol},a}+\rho_H$.
+Otherwise more than $(1-\eta)M$ indices have $w\gamma>AH$.
+The scalar estimate then gives normalized main exponent at most
+$-\nu(A(1-\eta)-\bar b)$; discard the nonpositive collision term.
+There are at most $Q_H^M$ expansion terms.  Taking absolute values
+before summing gives
+\begin{equation}
+ \frac{\log|\Delta_H|}{MH}
+ \le E_{\rm tr}+E_{{\rm hol},a}+\varepsilon_H
+    +\max\{-cL_H,-\nu(A(1-\eta)-\bar b)\},
+ \quad\varepsilon_H=\rho_H+\frac{\log Q_H}{H}\to0.
+ \label{rat:upper}
+\end{equation}
+For the second alternative the gap over $1-\bar b$ is at least $g$,
+because
+\[
+ \nu(A(1-\eta)-\bar b)-(1-\bar b)
+ =\nu A(1-\eta)-1-(\nu-1)\bar b\ge g.
+\]
+For the first alternative use $1-\bar b\le1$ and $L_H\to L$.
+Under \eqref{rat:conditions}, both upper bounds in
+\eqref{rat:upper} are strictly less than the lower bound
+$-(1-\bar b)-E_{\rm ar}$ for sufficiently large $H$.  This
+contradicts \eqref{rat:lower}.
+
+\subsection{Finite parameter choice for each fixed base}
+
+\begin{proof}[Proof of Theorem~\ref{rat:main}]
+Fix $a=u/v\in\QQ_{>0}\setminus\{1\}$ and $\nu>2$ before making any
+dimension or approximation choice.  Suppose that arbitrarily large
+integers $q$ admit $p\in\ZZ$ with $|\log a-p/q|\le q^{-\nu}$.
+Choose $\theta,A,B,C,\eta$ as in Lemma~\ref{par:constants}, so
+\[
+ 0<\theta<A<B<1,\qquad C>1,\qquad CB<1,\qquad B<C\theta<1,
+ \qquad g>0.
+\]
+Let $\varepsilon_0=\min(g/2,1/2)$ and choose $F_0>2/\theta$ such that
+$\nu/F_0<\varepsilon_0/3$.
+For a variable positive integer $m$, set
+\[
+ K=\lfloor C^m\rfloor,\qquad w_0=B^{-m},\qquad
+ v_0=2K\theta^m w_0.
+\]
+The interpolation volume hypotheses hold, since
+$K\theta^m\le(C\theta)^m<1$ and
+$K(w_0/v_0)\theta^m=1/2$.
+Moreover
+\[
+ \frac{K}{w_0}\le(CB)^m\to0,\qquad
+ v_0\sim2(C\theta/B)^m\to\infty,\qquad m/v_0\to0,
+ \qquad
+ L=\frac{\eta^2(B/A)^m}{2(m+1)}\to\infty.
+\]
+Because $a$ was already fixed, these limits also give
+\[
+ R_a/w_0=4(1+|\log a|)K/w_0\to0,\qquad
+ (K-1)\log v/w_0\to0.
+\]
+Consequently one finite $m$ can be chosen such that
+\begin{equation}
+ w_0\ge(K-1)\log v,\qquad
+ \frac{\Lambda F_0m+2\log2}{v_0}+\frac{R_a}{w_0}
+       <\varepsilon_0/3,\qquad cL>2.
+ \label{rat:dimension-margin}
+\end{equation}
+Fix this $m$, hence $K,w_0,v_0,R_a$ and all the constants in this display.
+
+Choose $m$ approximations as in \eqref{rat:approximations}
+successively, with denominators sufficiently large to satisfy the
+successive weight thresholds of Theorem~\ref{geom:interpolation} and
+\begin{equation}
+ \Lambda\sum_i\frac1{w_i}
+ +\frac{\theta+\log4+\log(2K)+\nu+\log(2R_a)}{w_*}
+       <\varepsilon_0/3.
+ \label{rat:weight-margin}
+\end{equation}
+To realize the last inequality, first impose a sufficiently large common
+lower bound on all $w_i$, using $\sum_i1/w_i\le m/w_*$.
+Then impose the geometric threshold for each weight after its predecessors
+have been chosen.  The assumed good denominators are unbounded, so every
+one of these finitely many lower bounds is attainable, even if those
+denominators are sparse.  The geometric weight thresholds are independent
+of the centers subsequently formed from these choices.
+No nonzero-numerator hypothesis is needed: the distinctness of $a^j$
+does not involve the $p_i$.
+
+The total error is exactly
+\[
+\begin{aligned}
+ E_a={}&\frac{\nu}{F_0}
+  +\frac{\Lambda F_0m+2\log2}{v_0}+\frac{R_a}{w_0}
+  +\Lambda\sum_i\frac1{w_i}\\
+ &+\frac{\theta+\log4+\log(2K)+\nu+\log(2R_a)}{w_*}
+ <\varepsilon_0.
+\end{aligned}
+\]
+Thus $E_a<g$ and $cL>2>1+E_a$, and all conditions
+\eqref{rat:conditions} hold.  After fixing these weights and centers,
+let $H$ tend to infinity through sufficiently divisible integers above
+the interpolation threshold for these particular centers.  The comparison
+\eqref{rat:upper}--\eqref{rat:lower} is a contradiction.  No uniform
+threshold in $H$ over different bases or centers has been used.
+
+The good denominators for the fixed $a,\nu$ are therefore bounded,
+which proves \eqref{rat:eventual-bound}.  If $\omega$ were rational,
+its exact representations with arbitrarily large positive denominators
+would contradict that bound, so $\omega$ is irrational.
+It follows that $\mu(\omega)\le2$.
+For completeness, pigeonhole applied to $0,\omega,\ldots,N\omega$
+modulo one gives $p\in\ZZ$ and $1\le q\le N$ with
+$0<|\omega-p/q|\le1/(qN)\le1/q^2$.
+The errors tend to zero as $N\to\infty$; after reduction the denominators
+must be unbounded, since $\omega$ is irrational.
+Every exponent less than two consequently occurs infinitely often,
+so $\mu(\omega)\ge2$.  This completes the conditional proof.
+\end{proof}
+
+\subsection{Rational scaling and further conditional consequences}
+
+\begin{lemma}[Invariance under nonzero rational scaling]
+\label{rat:scaling}
+If $x$ is an irrational real number and $b\in\QQ\setminus\{0\}$,
+then $bx$ is irrational and $\mu(bx)=\mu(x)$.
+\end{lemma}
+
+\begin{proof}
+Write $b=r/s$ with $r\in\ZZ\setminus\{0\}$, $s\ge1$ and
+$\gcd(|r|,s)=1$.  Irrationality of $bx$ follows by division by $b$.
+Suppose a positive exponent $\tau$ occurs infinitely often for $x$,
+with coprime $p,q$, $q\ge2$, and
+$0<|x-p/q|<q^{-\tau}$.
+Reduce $rp/(sq)$ to $P/Q$, and set $d=\gcd(|rp|,sq)$.
+Since $\gcd(p,q)=1$, a Bezout identity for $p,q$ shows that $d$ divides
+$rs$: multiply that identity by $rs$, noting that $d$ divides both
+$rp$ and $sq$.  Thus $1\le d\le|r|s$ and
+\[
+ q/|r|\le Q=sq/d\le sq.
+\]
+In particular $Q$ is unbounded.  Regardless of the sign of $r$,
+\[
+ 0<\left|bx-\frac PQ\right|
+ =\frac{|r|}{s}\left|x-\frac pq\right|
+ <\frac{|r|}{s}q^{-\tau}
+ \le |r|s^{\tau-1}Q^{-\tau}.
+\]
+For every $0<\lambda<\tau$, the fixed constant $|r|s^{\tau-1}$ is
+less than $Q^{\tau-\lambda}$ for all sufficiently large $Q$.
+Hence $\lambda$ occurs infinitely often for $bx$.
+Taking suprema and then letting $\lambda$ increase to each such
+$\tau$ gives $\mu(bx)\ge\mu(x)$, also when that supremum is infinite.
+Apply the same argument to $1/b$ and $bx$ to obtain the reverse inequality.
+\end{proof}
+
+\begin{corollary}[Conditional consequences; candidate]
+\label{rat:span}
+Assume Theorem~\ref{geom:interpolation} with its stated quantifiers.
+Every nonzero finite rational linear combination
+\[
+ \omega=\sum_{k=1}^n b_k\log a_k,
+ \qquad b_k\in\QQ,\quad a_k\in\QQ_{>0},
+\]
+is irrational and has $\mu(\omega)=2$.
+In particular this applies to $\log a$ whenever $a>0$ is algebraic,
+$a\ne1$, and $a^N\in\QQ$ for some integer $N\ge1$.
+\end{corollary}
+
+\begin{proof}
+Choose a positive integer $N$ such that all $Nb_k$ are integers.
+The real logarithm identities give
+\[
+ N\omega=\log r,\qquad
+ r=\prod_{k=1}^n a_k^{Nb_k}\in\QQ_{>0}.
+\]
+Negative integer exponents preserve positive rationality.  Since
+$\omega\ne0$, one has $r\ne1$.  Theorem~\ref{rat:main} gives
+irrationality and exponent two for $\log r$, conditionally on the
+interpolation hypothesis.  Lemma~\ref{rat:scaling} with the factor
+$1/N$ gives the assertion for $\omega$.
+For the final statement, $r=a^N$ is positive rational and is not one,
+and $\log a=(1/N)\log r$; apply the same argument.
+\end{proof}
+
+The conditional statements above add no interpolation dependency beyond
+Theorem~\ref{geom:interpolation}.  They assert a base-dependent eventual
+denominator threshold, rather than a common threshold over all rational
+bases.  They make no claim about logarithms of arbitrary positive
+algebraic numbers whose positive integer powers are never rational.
+
+
+\section{Audit interface for the candidate proof}
+The key dependency is Theorem~\ref{geom:interpolation}, including its
+center-independent successive weight thresholds. Its proposed proof
+passes through the local transverse multiplicity bound, persistent
+derivative-ideal components, the residue obstruction forcing constant
+$Y$, and the ordinary blow-up and Serre-vanishing interpolation argument.
+Replacing $Y=1$ by $Y=2^j$ is a new mathematical step.
+
+If that geometric statement and the determinant estimates hold as
+written, Section 4 selects a finite dimension for each fixed $\nu>2$,
+then chooses approximation denominators and their separated weights,
+then fixes the centers, and only finally lets $H$ tend to infinity.
+Excluding unbounded $\nu$-good approximations for every $\nu>2$ gives
+$\mu(\log2)\le2$; the final Dirichlet argument gives the reverse bound.
+The endpoint equality is therefore a conditional consequence of the
+complete proposed chain, not a deduction from finite numerical tests.
+
+Internal readers have not located a definite invalid inference in the
+inspected chain. That observation is not proof certification. The new
+interpolation theorem, its hypotheses, and its use in the determinant
+contradiction should be checked before citing this document as a result.
+
+\clearpage
+\begin{thebibliography}{99}
+\bibitem{openai} OpenAI, \emph{The irrationality exponent of $\pi$ is $2$},
+24 September 2026. \href{https://github.com/openai/math/blob/main/preprints/The-irrationality-exponent-of-pi-is-2-September-24-2026/paper.pdf}{Manuscript and source repository}.
+\bibitem{marcovecchio} R. Marcovecchio, \emph{The Rhin--Viola method for log 2},
+Acta Arith. 139 (2009), 147--184.
+\href{https://www.impan.pl/shop/en/publication/transaction/download/product/82234}{Publisher PDF}.
+\bibitem{mondal2021} P. Mondal, \emph{How many zeroes?}, Draft III,
+\href{https://arxiv.org/abs/1806.05346v5}{arXiv:1806.05346v5},
+Corollary VIII.3, for isolated local intersection multiplicities.
+\bibitem{stacks} The Stacks Project,
+\href{https://stacks.math.columbia.edu/tag/02OS}{02OS},
+\href{https://stacks.math.columbia.edu/tag/02ND}{02ND},
+\href{https://stacks.math.columbia.edu/tag/02NS}{02NS},
+\href{https://stacks.math.columbia.edu/tag/0AG6}{0AG6},
+\href{https://stacks.math.columbia.edu/tag/0AG7}{0AG7},
+\href{https://stacks.math.columbia.edu/tag/0B5U}{0B5U},
+\href{https://stacks.math.columbia.edu/tag/0BXX}{0BXX}.
+\bibitem{lazarsfeld} R. Lazarsfeld, \emph{Positivity in Algebraic Geometry I},
+Springer, 2004, Corollary 1.4.10.
+\bibitem{demailly1992} J.-P. Demailly, \emph{Singular hermitian metrics on positive
+line bundles}, LNM 1507 (1992), 87--104, Section 6.
+\bibitem{philippon1986} P. Philippon, \emph{Lemmes de z\'eros dans les groupes
+alg\'ebriques commutatifs}, Bull. SMF 114 (1986), 355--383; errata 115 (1987).
+\bibitem{laurent1991} M. Laurent, \emph{Sur quelques r\'esultats r\'ecents de
+transcendance}, Ast\'erisque 198--200 (1991), 209--230, Section 6.
+\bibitem{laurent2000} M. Laurent, \emph{Interpolation determinants of exponential
+polynomials}, Publ. Math. Debrecen 56 (2000), 457--473, Theorem 1.
+\end{thebibliography}
+\end{document}

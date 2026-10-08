@@ -1,0 +1,27 @@
+logarithm-irrationality-candidate
+
+This repository contains adapted material from:
+OpenAI, The irrationality exponent of pi is 2, dated 24 September 2026.
+Source manuscript and repository:
+https://github.com/openai/math/blob/main/preprints/The-irrationality-exponent-of-pi-is-2-September-24-2026/paper.pdf
+https://github.com/openai/math
+
+The source material is distributed under the Apache License, Version 2.0.
+The accompanying LICENSE is reproduced verbatim from its source license.
+
+Sections 2-4 of paper.tex adapt the source manuscript's local multiplicity,
+projective interpolation, determinant, and parameter mechanisms. Changes
+include distinct multiplicative interpolation centers Y=2^j and Y=a^j,
+a proposed rational-base denominator-clearing argument, target-dependent
+analytic bounds, and rational-scaling corollaries. The manuscript retains
+attribution to the earlier work used by these mechanisms.
+
+This is a research draft prepared with Codex. It is not an official OpenAI
+publication. Attribution to the source does not imply endorsement of this
+repository or its candidate claims by OpenAI or the authors of cited works.
+Internal audits and finite checks do not constitute peer or formal proof
+certification.
+
+Modification date: 8 October 2026.
+Upstream paper.pdf Git blob SHA-1: 85118d5a6bc63ab5d06df03cce4efdffd2113155.
+Upstream repository tree SHA-1 when retrieved: adc7f1241b42e322a6451854ab7e4b4c146bf78a.

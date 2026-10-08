@@ -1,0 +1,44 @@
+{
+  "status": "passed",
+  "arithmetic": "exact rational coefficients",
+  "coefficients_checked": 56000,
+  "bases": [
+    "2/3",
+    "3/2",
+    "1/5",
+    "5",
+    "101/103"
+  ],
+  "K": 4,
+  "h_range": [
+    0,
+    3
+  ],
+  "alpha_ranges": [
+    [
+      0,
+      3
+    ],
+    [
+      0,
+      3
+    ]
+  ],
+  "Taylor_coefficient_range": [
+    0,
+    6
+  ],
+  "approximation_denominators": [
+    7,
+    11
+  ],
+  "approximation_numerators": [
+    5,
+    -3
+  ],
+  "truncation_cutoffs": [
+    3,
+    5
+  ],
+  "scope": "Finite denominator-clearing test only; does not certify interpolation or exponent two."
+}

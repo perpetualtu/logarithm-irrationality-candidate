@@ -1,0 +1,12 @@
+{
+  "pages": 23,
+  "all_pages_have_text": true,
+  "unresolved_references": false,
+  "overfull_boxes": false,
+  "out_of_page_glyphs": [],
+  "rendering": "All 23 pages rendered and visually inspected; no layout defects found.",
+  "tex_sha256": "b9e2e6651b68c575a9a15bc58faf127194982a435d999e5210b98341c60fe4c3",
+  "pdf_sha256": "9f8f405c65f3a6a504a749d9c46f113ba603d809b33c928d036a011399538089",
+  "frozen_log2_source_sha256": "36284b2b781b7a3b7d54fb6eaf46e585b6b408132dcb253b3242ff5621c584f0",
+  "scope": "Compilation and document quality checks; not mathematical certification."
+}
